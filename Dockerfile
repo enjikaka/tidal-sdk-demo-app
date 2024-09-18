@@ -12,8 +12,7 @@ RUN npm ci
 
 RUN apk add --no-cache make
 
-RUN echo "Building for client: ${API_CLIENT_ID} ${API_CLIENT_SECRET}"
-RUN make build
+RUN API_CLIENT_ID=${API_CLIENT_ID} API_CLIENT_SECRET=${API_CLIENT_SECRET} make build
 
 FROM denoland/deno:distroless-1.46.1
 EXPOSE 8000
