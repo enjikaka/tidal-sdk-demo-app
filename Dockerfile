@@ -1,9 +1,15 @@
 FROM node:lts-alpine AS builder
-ADD . .
-RUN apk add --no-cache make
+COPY package.json .
+COPY package-lock.json .
 RUN npm ci
-RUN echo $API_CLIENT_ID
-RUN API_CLIENT_ID=$API_CLIENT_ID API_CLIENT_SECRET=$API_CLIENT_SECRET make build
+
+RUN apk add --no-cache make
+
+ENV API_CLIENT_ID $API_CLIENT_ID
+ENV API_CLIENT_SECRET $API_CLIENT_SECRET
+
+RUN echo "Building for client: ${API_CLIENT_ID} ${API_CLIENT_SECRET}"
+RUN make build
 
 FROM denoland/deno:distroless-1.46.1
 EXPOSE 8000
