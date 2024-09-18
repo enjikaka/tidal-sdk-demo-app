@@ -186,6 +186,7 @@ footer {
   margin: 1.61em;
   border-radius: 12px;
   box-shadow: 0 2px 4px hsla(32.73deg 60% 8% / 90%);
+  view-transition-name: main-footer;
 }
 
 footer figure {
