@@ -30,7 +30,6 @@ const context = await esbuild.context({
     // @ts-ignore
     'process.env.API_CLIENT_ID': `'${process.env.API_CLIENT_ID}'`,
     'process.env.API_CLIENT_SECRET': `'${process.env.API_CLIENT_SECRET}'`,
-    'process.env.API_REDIRECT_URL': `'${process.env.API_REDIRECT_URL}'`,
   },
   plugins: [
     clean({
