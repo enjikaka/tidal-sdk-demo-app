@@ -16,6 +16,7 @@ RUN npm ci
 
 RUN apk add --no-cache make
 
+COPY . .
 RUN make build
 
 FROM denoland/deno:distroless-1.46.1
