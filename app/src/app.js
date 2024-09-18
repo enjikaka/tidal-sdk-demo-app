@@ -39,8 +39,9 @@ const session = new Promise(resolve => {
   Auth.credentialsProvider.bus(async e => {
     if (e instanceof CustomEvent && e.detail.type === 'CredentialsUpdatedMessage') {
       const credentials = await Auth.credentialsProvider.getCredentials();
+      const loggedIn = localStorage.getItem('loggedIn');
 
-      if (credentials) {
+      if (credentials && loggedIn === 'true') {
         whenLoggedIn();
         resolve(e.detail.payload);
       }
@@ -253,31 +254,33 @@ Player.events.addEventListener('playback-state-change', (/** @type {CustomEvent}
 }, false);
 
 const loadHandler = async () => {
-  const clientId = localStorage.getItem('clientId');
-  const redirectUri = localStorage.getItem('redirectUri');
+  await Auth.init({
+    // @ts-expect-error - Injected by esbuild
+    clientId: process.env.API_CLIENT_ID,
+    credentialsStorageKey: 'authorizationCode',
+    scopes: [
+      'playlists.read',
+      'user.read',
+      'recommendations.read',
+      'playback',
+    ],
+    // @ts-expect-error - Injected by esbuild
+    clientSecret: process.env.API_CLIENT_SECRET,
+    clientUniqueKey: 'tidal-boombox-example'
+  });
 
-  if (clientId && redirectUri) {
-    await Auth.init({
-      clientId,
-      credentialsStorageKey: 'authorizationCode',
-      scopes: [
-        'playlists.read',
-        'user.read',
-        'recommendations.read',
-        'playback',
-      ],
-      // @ts-expect-error - Injected by esbuild
-      clientSecret: process.env.API_CLIENT_SECRET,
-      clientUniqueKey: 'tidal-boombox-example'
-    });
+  if (window.location.search.length > 0) {
+    await Auth.finalizeLogin(window.location.search);
+    localStorage.setItem('loggedIn', 'true');
+    window.location.replace('/');
+  }
 
-    if (window.location.search.length > 0) {
-      await Auth.finalizeLogin(window.location.search);
-      window.location.replace('/');
-    } else {
-      Player.setCredentialsProvider(Auth.credentialsProvider);
-      Array.from($$('.logged-out-menu-item')).forEach(el => el.remove());
-    }
+  const loggedIn = localStorage.getItem('loggedIn');
+
+  if (loggedIn === 'true') {
+    Player.setCredentialsProvider(Auth.credentialsProvider);
+
+    Array.from($$('.logged-out-menu-item')).forEach(el => el.remove());
   } else {
     Array.from($$('.logged-in-menu-item')).forEach(el => el.remove());
   }
