@@ -4,7 +4,7 @@ build_service_worker:
 	rm service-worker.built.js
 
 build_app:
-	node scripts/esbuild-app.js
+	node --env-file=.env scripts/esbuild-app.js
 	cp app/src/index.html dist/index.html
 	cp app/src/fallback.svg dist/fallback.svg
 	cp app/src/icons.svg dist/icons.svg
