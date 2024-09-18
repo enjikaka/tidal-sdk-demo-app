@@ -7,6 +7,7 @@ import './tidal-progress-bar.js';
 import './tidal-current-time.js';
 import './tidal-duration-time.js';
 
+import './loading-indicator.js';
 import './tidal-image.js';
 import './play-trigger.js';
 import './login-module.js';
@@ -87,6 +88,7 @@ document.querySelector('#skip-next-button').addEventListener('click', () => {
 */
 
 async function renderPage() {
+  document.body.classList.add('loading-page');
   const path = document.location.hash.includes('#!/') ? document.location.hash.split('/').slice(1).join('/') : 'home';
 
   let credentials;
@@ -94,8 +96,6 @@ async function renderPage() {
   if (path !== 'login') {
     credentials = await session;
   }
-
-  mainEl.innerHTML = `Loading...`;
 
   const headers = new Headers();
 
@@ -108,7 +108,17 @@ async function renderPage() {
   });
   const html = await response.text();
 
-  mainEl.innerHTML = html;
+  const commitPage = () => {
+    mainEl.innerHTML = html;
+    document.body.classList.remove('loading-page');
+  };
+
+  if ('startViewTransition' in document) {
+    // @ts-ignore
+    document.startViewTransition(() => commitPage());
+  } else {
+    commitPage();
+  }
 }
 
 function renderError(e) {
@@ -131,20 +141,6 @@ function init() {
   } catch (e) {
     renderError(e);
   }
-
-
-  /*
-  requestIdleCallback(() => {
-    const tidalImage = $('tidal-image');
-
-    if (tidalImage) {
-      const firstImageSrc = tidalImage._sDOM.querySelector('img').src;
-
-      document.body.style.backgroundImage = `url(${firstImageSrc})`;
-      document.body.style.backgroundSize = `cover`;
-    }
-  });
-  */
 }
 
 function waitForMetaDataChange() {

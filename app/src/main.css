@@ -1,3 +1,33 @@
+@view-transition {
+  navigation: auto;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+
+@keyframes fade-out {
+  to { opacity: 0; }
+}
+
+@keyframes slide-from-right {
+  from { transform: translateX(30px); }
+}
+
+@keyframes slide-to-left {
+  to { transform: translateX(-30px); }
+}
+
+::view-transition-old(root) {
+  animation: 90ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
+    300ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-left;
+}
+
+::view-transition-new(root) {
+  animation: 210ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
+    300ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
+}
+
 body {
   font-family: "Inria Sans", sans-serif;
   font-weight: 400;
@@ -19,8 +49,7 @@ svg {
   height: 24px;
 }
 
-h2,
-strong {
+h2 {
   display: block;
   margin: 1rem 0 0.5rem;
 }
@@ -41,7 +70,7 @@ a:hover {
 }
 
 .off-screen {
-  transform: translateY(100%);
+  transform: translateY(150%);
 }
 
 footer {
@@ -71,10 +100,13 @@ header {
   z-index: 99;
   padding: 0 1rem;
   box-sizing: border-box;
+  view-transition-name: main-header;
 }
 
 header strong {
   color: rgb(228 110 12);
+  display: grid;
+  place-content: center;
 }
 
 header nav {
@@ -149,8 +181,11 @@ footer {
   will-change: transform;
   transform: translateZ(0);
   contain: strict;
-  height: 84px;
+  height: 64px;
   color: rgb(189 179 161);
+  margin: 1.61em;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px hsla(32.73deg 60% 8% / 90%);
 }
 
 footer figure {
@@ -159,8 +194,6 @@ footer figure {
 }
 
 footer .row {
-  padding: 0.5rem;
-
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
@@ -185,12 +218,6 @@ main {
   max-width: 100%;
   overflow: hidden;
   will-change: scroll-position;
-}
-
-.row .column {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
 }
 
 album-header {
@@ -220,6 +247,7 @@ footer img {
   overflow: hidden;
   margin: 0.5rem;
   transition: max-width 500ms ease;
+  border-radius: 6px;
 }
 
 footer video {
@@ -248,6 +276,13 @@ footer video {
   font-size: 10pt;
   color: white;
   margin: 0 0.5em;
+  max-width: 200px;
+  overflow: hidden;
+
+  & span {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
 }
 
 #artist {
@@ -258,12 +293,7 @@ footer video {
   display: none;
 }
 
-.current-media-product-image {
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.column.timing-info {
+.timing-info {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
@@ -272,6 +302,8 @@ footer video {
   & tidal-current-time,
   & tidal-duration-time {
     color: currentcolor;
+    font-size: .8em;
+    font-variant: tabular-nums;
   }
 
   & tidal-progress-bar {
@@ -283,4 +315,16 @@ footer video {
     color: oklch(0.67 0.17 50.52);
     background-color: oklch(0.47 0.17 50.52);
   }
+}
+
+.controls {
+  justify-content: center;
+}
+
+loading-indicator {
+  height: 3px;
+}
+
+body:not(.loading-page) loading-indicator {
+  opacity: 0;
 }

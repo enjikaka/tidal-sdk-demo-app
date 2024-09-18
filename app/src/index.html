@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="main.css">
   <script src="https://dret.jeremy.se/redirect.js"></script>
 </head>
-<body>
+<body class="loading-page">
   <header>
     <strong>music</strong>
     <nav>
@@ -36,30 +36,33 @@
       </a>
     </nav>
   </header>
-  <main>
-    Please log in!
-  </main>
+  <loading-indicator></loading-indicator>
+  <main></main>
   <footer class="off-screen">
     <div class="row">
-      <figure class="current-media-product-image">
+      <figure>
         <img loading="lazy" decoding="async" sizes="48px" crossorigin="anonymous">
       </figure>
-      <button id="toggle-playback-button">
-        <svg id="play-icon">
-          <use href="icons.svg#play"></use>
-        </svg>
-        <svg id="pause-icon">
-          <use href="icons.svg#pause"></use>
-        </svg>
-      </button>
       <div class="meta">
         <span id="title"></span>
         <span id="artist"></span>
       </div>
-      <div class="column spread timing-info">
-        <tidal-current-time></tidal-current-time>
-        <tidal-progress-bar></tidal-progress-bar>
-        <tidal-duration-time></tidal-duration-time>
+      <div class="column spread">
+        <div class="timing-info row">
+          <tidal-current-time></tidal-current-time>
+          <tidal-progress-bar></tidal-progress-bar>
+          <tidal-duration-time></tidal-duration-time>
+        </div>
+        <div class="row controls">
+          <button id="toggle-playback-button">
+            <svg id="play-icon">
+              <use href="icons.svg#play"></use>
+            </svg>
+            <svg id="pause-icon">
+              <use href="icons.svg#pause"></use>
+            </svg>
+          </button>
+        </div>
       </div>
       <div class="column">
         <!--<button id="skip-next-button">
