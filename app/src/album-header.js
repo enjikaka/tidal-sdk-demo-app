@@ -1,21 +1,19 @@
 import { registerFunctionComponent } from 'webact';
 
 async function AlbumHeader() {
-  const { html, css, Render, $ } = this;
+  const { html, css } = this;
 
   css`
   :host {
     content-visibility: auto;
     display: flex;
     flex-flow: row nowrap;
+    gap: 1.61rem;
   }
 
   figure {
     all: unset;
-    margin-right: 1.61rem;
-    width: 128px;
-    border-radius: 6px;
-    overflow: hidden;
+    display: contents;
   }
 
   .meta {
@@ -33,6 +31,11 @@ async function AlbumHeader() {
   ::slotted([slot="artists"]) {
     font-size: 1em;
     margin: 0;
+  }
+
+  ::slotted([slot="image"]) {
+    overflow: hidden;
+    border-radius: 6px;
   }
 
   button {
