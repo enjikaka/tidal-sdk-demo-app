@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+  <title>music</title>
+  <link rel="stylesheet" href="main.css">
+  <script src="https://dret.jeremy.se/redirect.js"></script>
+</head>
+<body>
+  <header>
+    <strong>music</strong>
+    <nav>
+      <a href="#">
+        <svg width="24" height="24"><use href="./icons.svg#home"></use></svg>
+        <span>Home</span>
+      </a>
+      <a href="#!/my-mixes/" class="logged-in-menu-item">
+        <svg><use href="./icons.svg#stars"></use></svg>
+        <span>My Mixes</span>
+      </a>
+      <a href="#!/my-playlists/" class="logged-in-menu-item">
+        <svg><use href="./icons.svg#playlist"></use></svg>
+        <span>My Playlists</span>
+      </a>
+      <a href="#!/login" class="logged-out-menu-item">
+        <svg><use href="./icons.svg#login"></use></svg>
+        <span>Log in</span>
+      </a>
+      <a href="#!/logout" class="logged-in-menu-item">
+        <svg><use href="./icons.svg#logout"></use></svg>
+        <span>Log out</span>
+      </a>
+    </nav>
+  </header>
+  <main>
+    Please log in!
+  </main>
+  <footer class="off-screen">
+    <div class="row">
+      <figure class="current-media-product-image">
+        <img loading="lazy" decoding="async" sizes="48px" crossorigin="anonymous">
+      </figure>
+      <button id="toggle-playback-button">
+        <svg id="play-icon">
+          <use href="icons.svg#play"></use>
+        </svg>
+        <svg id="pause-icon">
+          <use href="icons.svg#pause"></use>
+        </svg>
+      </button>
+      <div class="meta">
+        <span id="title"></span>
+        <span id="artist"></span>
+      </div>
+      <div class="column spread timing-info">
+        <tidal-current-time></tidal-current-time>
+        <tidal-progress-bar></tidal-progress-bar>
+        <tidal-duration-time></tidal-duration-time>
+      </div>
+      <div class="column">
+        <!--<button id="skip-next-button">
+          <svg><use href="icons.svg#next"></use></svg>
+        </button>
+        <button id="toggle-play-queue-button">
+          <svg><use href="icons.svg#queue"></use></svg>
+        </button>-->
+      </div>
+    </div>
+  </footer>
+  <play-queue></play-queue>
+  <script src="app.js" type="module"></script>
+  <script>
+    const mainEl = document.querySelector('main');
+
+    // Check that service workers are supported
+    if ('serviceWorker' in navigator) {
+      // Use the window load event to keep the page load performant
+      window.addEventListener('load', async () => {
+        const registration = await navigator.serviceWorker.register('sw.js');
+
+        if (registration.waiting) {
+          document.location.reload();
+        }
+
+        if (registration.installing) {
+          mainEl.textContent = 'Installing required modules...';
+
+          registration.installing.onstatechange = e => {
+            if (e.target.state === 'activating') {
+              mainEl.textContent = 'Activating modules...';
+            }
+
+            if (e.target.state === 'activated') {
+              mainEl.textContent = 'Done.';
+              document.location.reload();
+            }
+          };
+        }
+      });
+    }
+  </script>
+</body>
+</html>

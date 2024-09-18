@@ -1,0 +1,286 @@
+body {
+  font-family: "Inria Sans", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  margin: 0;
+  overflow-y: scroll;
+  background-color: rgb(237 224 208);
+  color: rgb(30 19 5);
+}
+
+strong, h1 {
+  font-weight: 600;
+}
+
+svg {
+  fill: currentcolor;
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+h2,
+strong {
+  display: block;
+  margin: 1rem 0 0.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 400;
+  text-transform: lowercase;
+}
+
+a {
+  color: currentColor;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.off-screen {
+  transform: translateY(100%);
+}
+
+footer {
+  transform: none;
+  transition: transform 500ms ease;
+}
+
+#skip-next-button,
+#toggle-play-queue-button,
+#toggle-playback-button {
+  all: unset;
+  cursor: pointer;
+}
+
+footer button svg {
+  width: 1em;
+  height: 1em;
+}
+
+header {
+  background-color: rgb(44 29 11);
+  color: rgb(189 179 161);
+  display: flex;
+  width: 100%;
+  position: sticky;
+  top: -1px;
+  z-index: 99;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+header strong {
+  color: rgb(228 110 12);
+}
+
+header nav {
+  text-align: right;
+  flex: 1;
+
+  & a {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  & span {
+    height: 24px;
+    display: grid;
+    place-content: center;
+  }
+
+  & svg {
+    fill: currentcolor;
+  }
+
+  & a:hover {
+    color: white;
+  }
+}
+
+nav {
+  padding: 1rem;
+}
+
+@media (min-width: 920px) {
+  nav a:not(:first-child) {
+    margin-left: 1rem;
+  }
+}
+
+@media (max-width: 920px) {
+  header {
+    flex-direction: column;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  header nav {
+    background-color: #e2e2e2;
+    color: black;
+    width: 100%;
+    text-align: left;
+    width: 100%;
+  }
+}
+
+@media (max-width: 630px) {
+  header nav {
+    display: flex;
+    flex-flow: column nowrap;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: hsla(32.73deg 60% 10.78% / 90%);
+  backdrop-filter: blur(5px);
+  will-change: transform;
+  transform: translateZ(0);
+  contain: strict;
+  height: 84px;
+  color: rgb(189 179 161);
+}
+
+footer figure {
+  all: unset;
+  display: contents;
+}
+
+footer .row {
+  padding: 0.5rem;
+
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+audio-visualiser {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: block;
+  height: 0.8rem;
+  pointer-events: none;
+  z-index: -1;
+}
+
+main {
+  padding: 0 1rem;
+  width: 625px;
+  margin: 0 auto 80px;
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: hidden;
+  will-change: scroll-position;
+}
+
+.row .column {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+album-header {
+  margin: 1rem 0;
+}
+
+horizontal-grid album-link {
+  display: block;
+  width: 128px;
+  height: 172px;
+  contain: strict;
+  margin: 0 0.5rem;
+}
+
+horizontal-grid album-link:first-child {
+  margin-left: 0;
+}
+
+footer img[src=""] {
+  max-width: 0px;
+}
+
+footer img {
+  width: 48px;
+  height: 48px;
+  max-width: 48px;
+  overflow: hidden;
+  margin: 0.5rem;
+  transition: max-width 500ms ease;
+}
+
+footer video {
+  aspect-ratio: 16 / 9;
+  height: 48px;
+  overflow: hidden;
+  margin: 0.5rem;
+}
+
+.column {
+  flex-flow: column nowrap;
+  margin: 0 0.5rem;
+}
+
+.column.spread {
+  flex: 1;
+}
+
+.column:last-child {
+  margin-right: 0;
+}
+
+.meta {
+  display: flex;
+  flex-flow: column nowrap;
+  font-size: 10pt;
+  color: white;
+  margin: 0 0.5em;
+}
+
+#artist {
+  font-size: 8pt;
+}
+
+#tidal-player-root {
+  display: none;
+}
+
+.current-media-product-image {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.column.timing-info {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 8px;
+
+  & tidal-current-time,
+  & tidal-duration-time {
+    color: currentcolor;
+  }
+
+  & tidal-progress-bar {
+    width: 100%;
+    flex: 1;
+    border-radius: 6px;
+    height: 6px;
+    overflow: hidden;
+    color: oklch(0.67 0.17 50.52);
+    background-color: oklch(0.47 0.17 50.52);
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "allowJs": true,
+    "checkJs": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "lib": [
+      "ES2023",
+      "dom"
+    ],
+    "target": "es2023"
+  },
+  "include": [
+    "service-worker/src",
+    "app/src"
+  ]
+}
