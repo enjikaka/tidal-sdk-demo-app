@@ -105,8 +105,7 @@ header {
 
 header strong {
   color: rgb(228 110 12);
-  display: grid;
-  place-content: center;
+  align-content: center;
 }
 
 header nav {
@@ -121,8 +120,7 @@ header nav {
 
   & span {
     height: 24px;
-    display: grid;
-    place-content: center;
+    align-content: center;
   }
 
   & svg {

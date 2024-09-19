@@ -18,9 +18,7 @@ async function AlbumHeader() {
 
   .meta {
     flex: 1;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
+    align-content: center;
   }
 
   ::slotted([slot="title"]) {
