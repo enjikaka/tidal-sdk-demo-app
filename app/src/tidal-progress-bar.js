@@ -215,11 +215,9 @@ class TidalProgressBar extends HTMLElement {
    * @throws Will throw an error if duration is not set.
    */
   stop() {
-    if (!this.#animation) {
-      throw new Error(ErrorMessages.NO_DURATION);
+    if (this.#animation) {
+      this.#animation.pause();
     }
-
-    this.#animation.pause();
   }
 
   /**
