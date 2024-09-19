@@ -20,12 +20,16 @@ export async function homeRouteHandler (request) {
     fetchMyPlaylists(authorization, 'horizontal'),
   ]);
 
+  const body = myMixes + myPlaylists;
+  const contentLength = new TextEncoder().encode(body).length;
+
   return cacheAndReturn(request, new Response(
-    myMixes + myPlaylists,
+    body,
     {
       status: 200,
       headers: new Headers({
         'content-type': 'text/html',
+        'content-length': String(contentLength),
         'cache-control': 'public, max-age=3600',
         'date': new Date().toUTCString(),
         'vary': authorization.split(' ')[1],

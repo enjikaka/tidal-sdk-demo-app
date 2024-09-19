@@ -22,7 +22,7 @@ const context = await esbuild.context({
   minify: true,
   sourcemap: true,
   mainFields: ['main'],
-  target: 'es2023',
+  target: 'es2022',
   platform: 'browser',
   format: 'esm',
   metafile: true,

@@ -288,4 +288,4 @@ const loadHandler = async () => {
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => loadHandler(), false);
+loadHandler();

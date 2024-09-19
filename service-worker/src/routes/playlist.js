@@ -57,19 +57,24 @@ export async function playlistRouteHandler (request) {
 
   const items = await Promise.all(playlistItems.map(item => itemToMediaItemRow(item, { authorization, albumColumn: false, coverColumn: false })));
 
+  const body = html`
+    <album-header>
+      ${imageForPlaylist(json.data.attributes)}
+      <h1 slot="title">${json.data.attributes.name}</h1>
+      <p slot="artists">${json.data.attributes.description}</p>
+    </album-header>
+    ${items.join('')}
+  `;
+
+  const contentLength = new TextEncoder().encode(body).length;
+
   return cacheAndReturn(request, new Response(
-    html`
-      <album-header>
-        ${imageForPlaylist(json.data.attributes)}
-        <h1 slot="title">${json.data.attributes.name}</h1>
-        <p slot="artists">${json.data.attributes.description}</p>
-      </album-header>
-      ${items.join('')}
-    `,
+    body,
     {
       status: 200,
       headers: new Headers({
         'content-type': 'text/html',
+        'content-length': String(contentLength),
         'cache-control': 'public, max-age=3600',
         'date': new Date().toUTCString(),
         'vary': authorization.split(' ')[1],
