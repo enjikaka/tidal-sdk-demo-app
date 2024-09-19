@@ -1,4 +1,4 @@
-import { itemToMediaItemRow, sortIncludedByRelationships, html, imageForPlaylist } from "../helpers.js";
+import { itemToMediaItemRow, sortIncludedByRelationships, html, imageForPlaylist, validCacheResponse, cacheAndReturn } from "../helpers.js";
 
 /**
  *
@@ -6,6 +6,13 @@ import { itemToMediaItemRow, sortIncludedByRelationships, html, imageForPlaylist
  * @returns {Promise<Response>}
  */
 export async function playlistRouteHandler (request) {
+  const cachedResponse = await validCacheResponse(request);
+
+  if (cachedResponse) {
+    console.debug('Returning cached response for', request.url);
+    return cachedResponse;
+  }
+
   const authorization = request.headers.get('authorization');
   const url = new URL(request.url);
   const [,,, playlistId] = url.pathname.split('/');
@@ -50,7 +57,7 @@ export async function playlistRouteHandler (request) {
 
   const items = await Promise.all(playlistItems.map(item => itemToMediaItemRow(item, { authorization, albumColumn: false, coverColumn: false })));
 
-  return new Response(
+  return cacheAndReturn(request, new Response(
     html`
       <album-header>
         ${imageForPlaylist(json.data.attributes)}
@@ -62,8 +69,10 @@ export async function playlistRouteHandler (request) {
     {
       status: 200,
       headers: new Headers({
-        'content-type': 'text/html'
+        'content-type': 'text/html',
+        'cache-control': 'public, max-age=3600',
+        'date': new Date().toUTCString()
       })
     }
-  );
+  ));
 }

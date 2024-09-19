@@ -250,6 +250,10 @@ Player.events.addEventListener('playback-state-change', (/** @type {CustomEvent}
 }, false);
 
 const loadHandler = async () => {
+  if (document.location.hash === '#/') {
+    document.location.replace('/');
+  }
+
   await Auth.init({
     // @ts-expect-error - Injected by esbuild
     clientId: process.env.API_CLIENT_ID,
@@ -279,6 +283,8 @@ const loadHandler = async () => {
     Array.from($$('.logged-out-menu-item')).forEach(el => el.remove());
   } else {
     Array.from($$('.logged-in-menu-item')).forEach(el => el.remove());
+    document.body.classList.remove('loading-page');
+    mainEl.innerHTML = 'Please log in to use this app.';
   }
 };
 
