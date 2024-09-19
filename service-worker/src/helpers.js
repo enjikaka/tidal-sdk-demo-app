@@ -14,8 +14,9 @@ export async function validCacheResponse (request) {
 
   if (cachedResponse) {
     const cacheControl = cachedResponse.headers.get('cache-control');
+    const varyMatch = cachedResponse.headers.get('vary') === request.headers.get('authorization').split(' ')[1];
 
-    if (cacheControl && cacheControl.includes('max-age')) {
+    if (cacheControl && varyMatch && cacheControl.includes('max-age')) {
       const maxAgeMatch = cacheControl.match(/max-age=(\d+)/);
 
       if (maxAgeMatch) {
@@ -143,7 +144,7 @@ export const fetchMyMixes = async (authorization, position) => {
 
   return `
     <h2>My Mixes</h2>
-    <${elementName}>${items.length === 0 ? 'No mixes found' : items}</${elementName}>
+    <${elementName}>${items.length === 0 ? 'No mixes found' : items.join('')}</${elementName}>
   `;
 };
 
@@ -160,7 +161,7 @@ export const fetchMyPlaylists = async (authorization, position) => {
 
   return `
     <h2>My Playlists</h2>
-    <${elementName}>${items.length === 0 ? 'No playlists found' : items}</${elementName}>
+    <${elementName}>${items.length === 0 ? 'No playlists found' : items.join('')}</${elementName}>
   `;
 };
 
@@ -177,7 +178,7 @@ async function myPlaylistsAsAlbumLinks (authorization) {
   });
   const json = await response.json();
 
-  return json.data.map(playlistDataToAlbumLink).join('');
+  return json.data.map(playlistDataToAlbumLink);
 }
 
 const playlistDataToAlbumLink = ({ attributes: playlist, id }) => {
@@ -206,9 +207,15 @@ async function myMixesAsAlbumLinks (authorization) {
   });
   const userRecommendationsJson = await userRecommendationsRespone.json();
 
+  const mixesCount = userRecommendationsJson.data.relationships.myMixes.data.length + userRecommendationsJson.data.relationships.newArrivalMixes.data.length + userRecommendationsJson.data.relationships.discoveryMixes.data.length;
+
+  if (mixesCount === 0) {
+    return [];
+  }
+
   return userRecommendationsJson.included
     .sort(myMixesNameSorter)
-    .map(playlistDataToAlbumLink).join('');
+    .map(playlistDataToAlbumLink);
 }
 
 const myMixesNameSorter = (a, b) => {

@@ -24,7 +24,8 @@ export async function myMixesRouteHandler (request) {
       headers: new Headers({
         'content-type': 'text/html',
         'cache-control': 'public, max-age=3600',
-        'date': new Date().toUTCString()
+        'date': new Date().toUTCString(),
+        'vary': authorization.split(' ')[1],
       })
     }
   ));
