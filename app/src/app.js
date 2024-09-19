@@ -250,6 +250,10 @@ Player.events.addEventListener('playback-state-change', (/** @type {CustomEvent}
 }, false);
 
 const loadHandler = async () => {
+  if (document.location.hash === '#/') {
+    document.location.replace('/');
+  }
+
   await Auth.init({
     // @ts-expect-error - Injected by esbuild
     clientId: process.env.API_CLIENT_ID,

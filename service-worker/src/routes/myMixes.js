@@ -1,4 +1,4 @@
-import { fetchMyMixes } from "../helpers.js";
+import { fetchMyMixes, validCacheResponse } from "../helpers.js";
 
 /**
  *
@@ -6,17 +6,32 @@ import { fetchMyMixes } from "../helpers.js";
  * @returns {Promise<Response>}
  */
 export async function myMixesRouteHandler (request) {
+  const cachedResponse = await validCacheResponse(request);
+
+  if (cachedResponse) {
+    console.debug('Returning cached response for', request.url);
+    return cachedResponse;
+  }
+
   const authorization = request.headers.get('authorization');
 
   const myMixes = await fetchMyMixes(authorization, 'vertical')
 
-  return new Response(
+  const response = new Response(
     myMixes,
     {
       status: 200,
       headers: new Headers({
-        'content-type': 'text/html'
+        'content-type': 'text/html',
+        'cache-control': 'public, max-age=3600',
+        'date': new Date().toUTCString()
       })
     }
   );
+
+  const cache = await caches.open("pages");
+
+  cache.put(request, response.clone());
+
+  return response;
 }

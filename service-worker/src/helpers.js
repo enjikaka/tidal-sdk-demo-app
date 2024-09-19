@@ -1,5 +1,34 @@
 export const html = String.raw;
 
+export async function validCacheResponse (request) {
+  const cache = await caches.open("pages");
+  const cachedResponse = await cache.match(request);
+
+  if (cachedResponse) {
+    const cacheControl = cachedResponse.headers.get('cache-control');
+
+    if (cacheControl && cacheControl.includes('max-age')) {
+      const maxAgeMatch = cacheControl.match(/max-age=(\d+)/);
+
+      if (maxAgeMatch) {
+        const maxAge = parseInt(maxAgeMatch[1], 10);
+        const dateHeader = cachedResponse.headers.get('date');
+
+        if (dateHeader) {
+          const fetchedTime = new Date(dateHeader).getTime();
+          const currentTime = Date.now();
+          const age = (currentTime - fetchedTime) / 1000; // age in seconds
+
+          if (age < maxAge) {
+            // Cache is still valid
+            return cachedResponse;
+          }
+        }
+      }
+    }
+  }
+}
+
 function parseISODurationToTime(duration) {
   const regex = /P(?:T)?(?:(\d+)M)?(?:(\d+)S)?/;
   const matches = duration.match(regex);
