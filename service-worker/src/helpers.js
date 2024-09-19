@@ -1,5 +1,13 @@
 export const html = String.raw;
 
+export async function cacheAndReturn (request, response) {
+  const cache = await caches.open("pages");
+
+  cache.put(request, response.clone());
+
+  return response;
+}
+
 export async function validCacheResponse (request) {
   const cache = await caches.open("pages");
   const cachedResponse = await cache.match(request);

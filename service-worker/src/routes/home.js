@@ -1,4 +1,4 @@
-import { fetchMyMixes, fetchMyPlaylists, validCacheResponse } from "../helpers.js";
+import { cacheAndReturn, fetchMyMixes, fetchMyPlaylists, validCacheResponse } from "../helpers.js";
 
 /**
  *
@@ -20,7 +20,7 @@ export async function homeRouteHandler (request) {
     fetchMyPlaylists(authorization, 'horizontal'),
   ]);
 
-  const response = new Response(
+  return cacheAndReturn(request, new Response(
     myMixes + myPlaylists,
     {
       status: 200,
@@ -30,11 +30,5 @@ export async function homeRouteHandler (request) {
         'date': new Date().toUTCString()
       })
     }
-  );
-
-  const cache = await caches.open("pages");
-
-  cache.put(request, response.clone());
-
-  return response;
+  ));
 }

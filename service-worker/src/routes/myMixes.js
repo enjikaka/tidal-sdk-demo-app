@@ -1,4 +1,4 @@
-import { fetchMyMixes, validCacheResponse } from "../helpers.js";
+import { cacheAndReturn, fetchMyMixes, validCacheResponse } from "../helpers.js";
 
 /**
  *
@@ -17,7 +17,7 @@ export async function myMixesRouteHandler (request) {
 
   const myMixes = await fetchMyMixes(authorization, 'vertical')
 
-  const response = new Response(
+  return cacheAndReturn(request, new Response(
     myMixes,
     {
       status: 200,
@@ -27,11 +27,5 @@ export async function myMixesRouteHandler (request) {
         'date': new Date().toUTCString()
       })
     }
-  );
-
-  const cache = await caches.open("pages");
-
-  cache.put(request, response.clone());
-
-  return response;
+  ));
 }

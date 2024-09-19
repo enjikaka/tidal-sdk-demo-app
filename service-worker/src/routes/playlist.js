@@ -1,4 +1,4 @@
-import { itemToMediaItemRow, sortIncludedByRelationships, html, imageForPlaylist, validCacheResponse } from "../helpers.js";
+import { itemToMediaItemRow, sortIncludedByRelationships, html, imageForPlaylist, validCacheResponse, cacheAndReturn } from "../helpers.js";
 
 /**
  *
@@ -57,7 +57,7 @@ export async function playlistRouteHandler (request) {
 
   const items = await Promise.all(playlistItems.map(item => itemToMediaItemRow(item, { authorization, albumColumn: false, coverColumn: false })));
 
-  const _response = new Response(
+  return cacheAndReturn(request, new Response(
     html`
       <album-header>
         ${imageForPlaylist(json.data.attributes)}
@@ -74,11 +74,5 @@ export async function playlistRouteHandler (request) {
         'date': new Date().toUTCString()
       })
     }
-  );
-
-  const cache = await caches.open("pages");
-
-  cache.put(request, _response.clone());
-
-  return _response;
+  ));
 }
