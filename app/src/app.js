@@ -283,6 +283,8 @@ const loadHandler = async () => {
     Array.from($$('.logged-out-menu-item')).forEach(el => el.remove());
   } else {
     Array.from($$('.logged-in-menu-item')).forEach(el => el.remove());
+    document.body.classList.remove('loading-page');
+    mainEl.innerHTML = 'Please log in to use this app.';
   }
 };
 
