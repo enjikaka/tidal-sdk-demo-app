@@ -2,7 +2,7 @@
 // @ts-expect-error - Global workbox variable
 __WB_DISABLE_DEV_LOGS = true;
 
-import { skipWaiting, clientsClaim } from 'workbox-core';
+import { clientsClaim } from 'workbox-core';
 import { registerRoute } from 'workbox-routing';
 import { precacheAndRoute } from 'workbox-precaching';
 
@@ -10,6 +10,7 @@ import { homeRouteHandler } from './routes/home.js';
 import { playlistRouteHandler } from './routes/playlist.js';
 import { myMixesRouteHandler } from './routes/myMixes.js';
 import { myPlaylistsRouteHandler } from './routes/myPlaylists.js';
+import { searchRouteHandler } from './routes/search.js';
 import { loginRouteHandler } from './routes/login.js';
 import { logoutRouteHandler } from './routes/logout.js';
 
@@ -37,6 +38,8 @@ async function pagesRouteHandler(details) {
         return myMixesRouteHandler(details.request);
       case 'my-playlists':
         return myPlaylistsRouteHandler(details.request);
+      case 'search':
+        return searchRouteHandler(details.request);
       case 'login':
         return loginRouteHandler(details.request);
       case 'logout':
@@ -60,5 +63,6 @@ registerRoute(
   async details => pagesRouteHandler(details)
 );
 
-skipWaiting();
+// @ts-expect-error - Types are weird...
+self.skipWaiting();
 clientsClaim();

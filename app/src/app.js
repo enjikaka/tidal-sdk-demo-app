@@ -284,7 +284,7 @@ const loadHandler = async () => {
   } else {
     Array.from($$('.logged-in-menu-item')).forEach(el => el.remove());
     document.body.classList.remove('loading-page');
-    mainEl.innerHTML = 'Please log in to use this app.';
+    mainEl.innerHTML = '<p>Please log in to use this app.</p>';
   }
 };
 
