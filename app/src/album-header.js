@@ -4,6 +4,10 @@ async function AlbumHeader() {
   const { html, css } = this;
 
   css`
+  @view-transition {
+    navigation: auto;
+  }
+
   :host {
     content-visibility: auto;
     display: flex;
@@ -34,6 +38,7 @@ async function AlbumHeader() {
   ::slotted([slot="image"]) {
     overflow: hidden;
     border-radius: 6px;
+    contain: layout;
   }
 
   button {
@@ -51,7 +56,7 @@ async function AlbumHeader() {
 
   html`
     <figure>
-      <slot name="image"></slot>
+      <slot name="image" part="image"></slot>
     </figure>
     <div class="meta">
       <slot name="title"></slot>

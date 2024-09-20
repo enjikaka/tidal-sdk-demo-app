@@ -35,9 +35,9 @@ async function AlbumLink() {
   ::slotted(img),
   ::slotted(tidal-image) {
     overflow: hidden;
-    contain: strict;
     box-sizing: border-box;
     transition: transform 150ms ease;
+    contain: layout;
   }
 
   ::slotted(a) {
@@ -71,6 +71,12 @@ async function AlbumLink() {
   `;
 
   postRender(() => {
+    $().addEventListener('pointerdown', () => {
+      const imageSlot = $('[name="image"]');
+
+      imageSlot.setAttribute('part', 'image');
+    });
+
     $().addEventListener('click', () => {
       const a = $('[name="album"]').assignedNodes().pop();
 

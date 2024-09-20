@@ -1,7 +1,7 @@
 import { registerFunctionComponent } from 'webact';
 
 function HorizontalGrid() {
-  const { html, css } = this;
+  const { html, css, postRender } = this;
 
   css`
     :host {

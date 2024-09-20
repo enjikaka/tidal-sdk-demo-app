@@ -20,6 +20,8 @@ import './griddy-grid.js';
 import './paginator-loader.js';
 import './play-queue.js';
 
+import { stringToElements } from './helpers.js';
+
 Player.bootstrap({
   outputDevices: false,
   players: [
@@ -88,7 +90,6 @@ document.querySelector('#skip-next-button').addEventListener('click', () => {
 */
 
 async function renderPage() {
-  document.body.classList.add('loading-page');
   const path = document.location.hash.includes('#!/') ? document.location.hash.split('/').slice(1).join('/') : 'home';
 
   let credentials;
@@ -106,19 +107,10 @@ async function renderPage() {
   const response = await fetch('/pages/' + path, {
     headers
   });
-  const html = await response.text();
+  const responseText = await response.text();
+  const elements = stringToElements(responseText);
 
-  const commitPage = () => {
-    mainEl.innerHTML = html;
-    document.body.classList.remove('loading-page');
-  };
-
-  if ('startViewTransition' in document) {
-    // @ts-ignore
-    document.startViewTransition(() => commitPage());
-  } else {
-    commitPage();
-  }
+  mainEl.replaceChildren(elements);
 }
 
 function renderError(e) {
@@ -136,7 +128,18 @@ function init() {
       document.location.hash === "" ||
       document.location.hash.includes('#!/')
     ) {
-      renderPage().catch(renderError);
+      document.body.classList.add('loading-page');
+      if ('startViewTransition' in document) {
+        // @ts-expect-error - startViewTransition
+        document.startViewTransition(renderPage).finished.finally(() => {
+          document.body.classList.remove('loading-page');
+        });
+      } else {
+        renderPage().catch(renderError).finally(() => {
+          document.body.classList.remove('loading-page');
+        });
+      }
+
     }
   } catch (e) {
     renderError(e);
