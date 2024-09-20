@@ -327,3 +327,19 @@ loading-indicator {
 body:not(.loading-page) loading-indicator {
   opacity: 0;
 }
+
+/*
+::view-transition-old(header-image),
+::view-transition-new(header-image) {
+  mix-blend-mode: normal;
+}
+
+::part(image) {
+  view-transition-name: header-image;
+  contain: layout;
+}
+
+::view-transition-image-pair(header-image) {
+  isolation: none;
+}
+*/
