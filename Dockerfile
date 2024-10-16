@@ -19,6 +19,8 @@ RUN apk add --no-cache make
 COPY . .
 RUN make build
 
-FROM karlsson/deno-file-server
+FROM denoland/deno:distroless-2.5.1
 EXPOSE 8000
-COPY --from=builder dist/ /usr/app/src
+COPY --from=builder dist/ .
+RUN ["deno", "cache", "jsr:@std/http/file-server"]
+CMD ["run", "--allow-net", "--allow-read", "jsr:@std/http/file-server"]
