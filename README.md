@@ -2,6 +2,9 @@
 
 A small demo application for using the TIDAL Open API.
 
+> [!CAUTION]
+> The TIDAL Open API has changed without versioning so the app is currently half-broken. 🥲
+
 ## Implementation notes
 
 ### Service-Worker Side Rendering (SWSR)
