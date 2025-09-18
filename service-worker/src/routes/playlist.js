@@ -1,11 +1,11 @@
-import { itemToMediaItemRow, sortIncludedByRelationships, html, imageForPlaylist, validCacheResponse, cacheAndReturn } from "../helpers.js";
+import { itemToMediaItemRow, sortIncludedByRelationships, html, validCacheResponse, cacheAndReturn, generateImageFromFilesProp } from "../helpers.js";
 
 /**
  *
  * @param {Request} request
  * @returns {Promise<Response>}
  */
-export async function playlistRouteHandler (request) {
+export async function playlistRouteHandler(request) {
   const cachedResponse = await validCacheResponse(request);
 
   if (cachedResponse) {
@@ -15,9 +15,9 @@ export async function playlistRouteHandler (request) {
 
   const authorization = request.headers.get('authorization');
   const url = new URL(request.url);
-  const [,,, playlistId] = url.pathname.split('/');
+  const [, , , playlistId] = url.pathname.split('/');
 
-  const response = await fetch(`https://openapi.tidal.com/v2/playlists/${playlistId}?countryCode=SE&include=items`, {
+  const response = await fetch(`https://openapi.tidal.com/v2/playlists/${playlistId}?countryCode=SE&include=items,coverArt`, {
     headers: new Headers({
       'authorization': authorization
     })
@@ -26,15 +26,13 @@ export async function playlistRouteHandler (request) {
   /** @type {Playlist} */
   const json = await response.json();
 
-  /** @type {Array<MediaProduct>} */
-  const included = sortIncludedByRelationships(json);
-  const itemsIds = included.map(item => item.id);
+  const itemsIds = json.data.relationships.items.data.map(item => item.id);
 
   const _url = new URL(`https://openapi.tidal.com/v2/tracks?countryCode=SE&include=albums,artists`);
 
   _url.searchParams.set('filter[id]', itemsIds.join(','));
 
-  const itemMetaDataResponse =  await fetch(_url.toString(), {
+  const itemMetaDataResponse = await fetch(_url.toString(), {
     headers: new Headers({
       'authorization': authorization
     })
@@ -57,11 +55,13 @@ export async function playlistRouteHandler (request) {
 
   const items = await Promise.all(playlistItems.map(item => itemToMediaItemRow(item, { authorization, albumColumn: false, coverColumn: false })));
 
+  const image = json.included.find(i => i.id === json.data.relationships.coverArt.data[0].id).attributes.files;
+
   const body = html`
     <album-header>
-      ${imageForPlaylist(json.data.attributes)}
       <h1 slot="title">${json.data.attributes.name}</h1>
       <p slot="artists">${json.data.attributes.description}</p>
+      ${image ? generateImageFromFilesProp(image) : ''}
     </album-header>
     ${items.join('')}
   `;

@@ -1,6 +1,29 @@
 export const html = String.raw;
 
-export async function cacheAndReturn (request, response) {
+/**
+ * 
+ * @param {*} path 
+ * @param {*} authorization 
+ * @returns 
+ */
+export async function tidalFetchJSON(path, authorization) {
+  const response = await fetch('https://openapi.tidal.com/v2' + path, {
+    headers: new Headers({
+      'authorization': authorization
+    })
+  });
+
+  const data = await response.json();
+
+  // Check if the response contains errors
+  if (data.errors && data.errors.length > 0) {
+    throw new Error(`API Error: ${data.errors[0].code} - ${data.errors[0].detail}`);
+  }
+
+  return data;
+}
+
+export async function cacheAndReturn(request, response) {
   const cache = await caches.open("pages");
 
   cache.put(request, response.clone());
@@ -8,7 +31,7 @@ export async function cacheAndReturn (request, response) {
   return response;
 }
 
-export async function validCacheResponse (request) {
+export async function validCacheResponse(request) {
   const cache = await caches.open("pages");
   const cachedResponse = await cache.match(request);
 
@@ -112,9 +135,9 @@ export function itemToArtistLink(artist) {
 * @returns
 */
 export async function itemToMediaItemRow(item, { albumColumn, coverColumn, authorization }) {
- const { mediaProduct, album, artist } = item;
+  const { mediaProduct, album, artist } = item;
 
- return `
+  return `
    <media-item-row item-type="${mediaProduct.type === 'videos' ? 'video' : 'track'}" item-id="${mediaProduct.id}" ${albumColumn ? 'album-cell' : ''} ${coverColumn ? 'cover-cell' : ''}>
      <span slot="title">${mediaProduct.attributes.title}${mediaProduct.attributes.mediaTags.includes('HI_RES') ? ' (MAX)' : ''}</span>
      <span slot="artist">${artist.attributes.name}</span>
@@ -124,9 +147,22 @@ export async function itemToMediaItemRow(item, { albumColumn, coverColumn, autho
  `;
 }
 
-export function imageForPlaylist(playlist) {
-  const src = playlist.imageLinks[0]?.href ?? 'fallback.svg';
-  const srcset = Object.values(playlist.imageLinks).map(v => `${v.href} ${v.meta.width}w`).join(', ');
+/**
+ * @typedef {object} TIDALFile
+ * @property {string} href
+ * @property {object} meta
+ * @property {number} meta.width
+ * @property {number} meta.height
+ */
+
+/**
+ * 
+ * @param {TIDALFile[]} images 
+ * @returns 
+ */
+export function generateImageFromFilesProp(images) {
+  const src = images[0].href ?? 'fallback.svg';
+  const srcset = Object.values(images).map(v => `${v.href} ${v.meta.width}w`).join(', ');
 
   return `<img slot="image" loading="lazy" decoding="async" src="${src}" srcset="${srcset}" sizes="128px" width="128px" height="128px" crossorigin="anonymous">`;
 }
@@ -170,25 +206,36 @@ export const fetchMyPlaylists = async (authorization, position) => {
  * @param {string} authorization
  * @returns
  */
-async function myPlaylistsAsAlbumLinks (authorization) {
-  const response = await fetch('https://openapi.tidal.com/v2/playlists/me', {
-    headers: new Headers({
-      'authorization': authorization
-    })
-  });
-  const json = await response.json();
+async function myPlaylistsAsAlbumLinks(authorization) {
+  const userJson = await tidalFetchJSON('/users/me', authorization);
 
-  return json.data.map(playlistDataToAlbumLink);
+  // Validate that we have the required user ID
+  if (!userJson.data || !userJson.data.id) {
+    console.error('Invalid user data received:', userJson);
+    throw new Error('Unable to retrieve user ID from /users/me endpoint');
+  }
+
+  const response = await tidalFetchJSON(`/playlists?include=coverArt&${encodeURIComponent('filter[owners.id]')}=${userJson.data.id}`, authorization);
+
+  const playlistsWithImages = response.data.map(playlist => {
+    return {
+      ...playlist,
+      images: response.included.find(i => i.id === playlist.relationships.coverArt.data[0].id).attributes.files
+    }
+  });
+
+  return playlistsWithImages.map(playlistDataToAlbumLink);
 }
 
-const playlistDataToAlbumLink = ({ attributes: playlist, id }) => {
+const playlistDataToAlbumLink = ({ attributes, images, id }) => {
+  const { name, description } = attributes;
   const link = `playlists/${id}`;
-  const image = imageForPlaylist(playlist);
+  const image = images ? generateImageFromFilesProp(images) : '';
 
   return `
     <album-link>
-      <a slot="album" href="#!/${link}">${playlist.name}</a>
-      ${playlist.description}
+      <a slot="album" href="#!/${link}">${name}</a>
+      ${description}
       ${image}
     </album-link>
   `;
@@ -199,13 +246,16 @@ const playlistDataToAlbumLink = ({ attributes: playlist, id }) => {
  * @param {string} authorization
  * @returns
  */
-async function myMixesAsAlbumLinks (authorization) {
-  const userRecommendationsRespone = await fetch('https://openapi.tidal.com/v2/userRecommendations/me?include=myMixes,discoveryMixes,newArrivalMixes', {
-    headers: new Headers({
-      'authorization': authorization
-    })
-  });
-  const userRecommendationsJson = await userRecommendationsRespone.json();
+async function myMixesAsAlbumLinks(authorization) {
+  const userJson = await tidalFetchJSON('/users/me', authorization);
+
+  // Validate that we have the required user ID
+  if (!userJson.data || !userJson.data.id) {
+    console.error('Invalid user data received:', userJson);
+    throw new Error('Unable to retrieve user ID from /users/me endpoint');
+  }
+
+  const userRecommendationsJson = await tidalFetchJSON(`/userRecommendations/${userJson.data.id}?include=myMixes,discoveryMixes,newArrivalMixes`, authorization);
 
   const mixesCount = userRecommendationsJson.data.relationships.myMixes.data.length + userRecommendationsJson.data.relationships.newArrivalMixes.data.length + userRecommendationsJson.data.relationships.discoveryMixes.data.length;
 

@@ -13,6 +13,7 @@
   },
   "include": [
     "service-worker/src",
-    "app/src"
+    "app/src",
+    "types.js"
   ]
 }
