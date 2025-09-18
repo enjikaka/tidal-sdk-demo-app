@@ -5,7 +5,7 @@ import { cacheAndReturn, fetchMyMixes, fetchMyPlaylists, validCacheResponse } fr
  * @param {Request} request
  * @returns {Promise<Response>}
  */
-export async function homeRouteHandler (request) {
+export async function homeRouteHandler(request) {
   const cachedResponse = await validCacheResponse(request);
 
   if (cachedResponse) {
