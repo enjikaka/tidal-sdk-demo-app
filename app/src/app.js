@@ -33,7 +33,7 @@ Player.bootstrap({
   ]
 })
 
-function whenLoggedIn () {
+function whenLoggedIn() {
   document.body.classList.add('logged-in');
 }
 
@@ -89,6 +89,40 @@ document.querySelector('#skip-next-button').addEventListener('click', () => {
 });
 */
 
+function renderSkeleton() {
+  const path = document.location.hash.includes('#!/') ? document.location.hash.split('/').slice(1).join('/') : 'home';
+  let skeleton = 'Loading...';
+
+  if (path.includes('playlists/')) {
+    import('./album-header.js');
+
+    const routeTransitionInformation = localStorage.getItem('route-transition-information');
+
+    if (routeTransitionInformation) {
+      const { title, imageHref, imageSrcSet } = JSON.parse(routeTransitionInformation);
+
+      skeleton = `
+        <album-header>
+          <img slot="image" src="${imageHref}" srcset="${imageSrcSet}" width="128px" height="128px" crossorigin="anonymous">
+          <h1 slot="title">${title}</h1>
+        </album-header>
+      `;
+
+      localStorage.removeItem('route-transition-information');
+    }
+  } else {
+    skeleton = `
+      <br>
+      Loading...
+      <br><br>
+      ${path}
+    `;
+  }
+
+  const elements = stringToElements(skeleton);
+  mainEl.replaceChildren(elements);
+}
+
 async function renderPage() {
   const path = document.location.hash.includes('#!/') ? document.location.hash.split('/').slice(1).join('/') : 'home';
 
@@ -110,7 +144,7 @@ async function renderPage() {
   const responseText = await response.text();
   const elements = stringToElements(responseText);
 
-  mainEl.replaceChildren(elements);
+  return elements;
 }
 
 function renderError(e) {
@@ -122,24 +156,28 @@ function renderError(e) {
   `;
 }
 
-function init() {
+async function init() {
   try {
     if (
       document.location.hash === "" ||
       document.location.hash.includes('#!/')
     ) {
+
       document.body.classList.add('loading-page');
+
+      renderSkeleton();
+
+      const elements = await renderPage();
+
+      const commit = () => mainEl.replaceChildren(elements);
+
       if ('startViewTransition' in document) {
-        // @ts-expect-error - startViewTransition
-        document.startViewTransition(renderPage).finished.finally(() => {
-          document.body.classList.remove('loading-page');
-        });
+        await document.startViewTransition(commit).finished;
       } else {
-        renderPage().catch(renderError).finally(() => {
-          document.body.classList.remove('loading-page');
-        });
+        commit();
       }
 
+      document.body.classList.remove('loading-page');
     }
   } catch (e) {
     renderError(e);

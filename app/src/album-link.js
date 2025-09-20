@@ -79,6 +79,13 @@ async function AlbumLink() {
 
     $().addEventListener('click', () => {
       const a = $('[name="album"]').assignedNodes().pop();
+      const image = $('[name="image"]').assignedNodes().pop();
+
+      localStorage.setItem('route-transition-information', JSON.stringify({
+        title: a.textContent,
+        imageHref: image.src,
+        imageSrcSet: image.srcset
+      }));
 
       a.click();
     })
